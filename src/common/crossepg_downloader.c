@@ -427,7 +427,7 @@ void *download (void *args)
 				} else {
 					/* Read the output a line at a time - output it. */
 					while (fgets(text_s, sizeof(text_s), fp_s) != NULL) {
-						printf ("%s", text_s); # ending '\n' is managed by script
+						printf ("%s", text_s); // ending '\n' is managed by script
 						fflush (stdout);
 					}
 
