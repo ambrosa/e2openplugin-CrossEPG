@@ -432,7 +432,7 @@ void *download (void *args)
 					}
 
 				  /* close */
-				  	  pclose(fp);
+				  	  pclose(fp_s);
 				}
 			exec = false;
 			interactive_send (ACTION_END);
