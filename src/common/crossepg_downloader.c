@@ -407,6 +407,8 @@ void *download (void *args)
 		else if (providers_get_protocol () == 4)
 		{
 			char filename[1024], tmp[1024], *tmp2;
+			FILE *fp_s; char text_s[80];
+
 			interactive_send (ACTION_START);
 			interactive_send_text (ACTION_TYPE, "RUNNING SCRIPT");
 			interactive_send_text (ACTION_URL, providers_get_script_filename ());
@@ -416,8 +418,22 @@ void *download (void *args)
 			tmp2 = replace_str (tmp, "%%homedir%%", homedir);
 			sprintf (filename, "LD_LIBRARY_PATH=%s %s/scripts/%s %s", homedir, homedir, providers_get_script_filename (), tmp2);
 
-			if (system (filename) != 0)
-				interactive_send_text (ACTION_ERROR, "script returned an error");
+//			if (system (filename) != 0)
+//				interactive_send_text (ACTION_ERROR, "script returned an error");				
+
+			fp_s = popen(filename, "r");
+				if (fp_s == NULL) {
+					interactive_send_text (ACTION_ERROR, "script returned an error");				
+				} else {
+					/* Read the output a line at a time - output it. */
+					while (fgets(text_s, sizeof(text_s), fp_s) != NULL) {
+						printf ("%s\n", text_s);
+						fflush (stdout);
+					}
+
+				  /* close */
+				  	  pclose(fp);
+				}
 			exec = false;
 			interactive_send (ACTION_END);
 		}
@@ -788,6 +804,7 @@ int main (int argc, char **argv)
 			else if (providers_get_protocol () == 4)
 			{
 				char filename[1024], tmp[1024], *tmp2;
+
 				log_add ("Provider %s identified as script", provider);
 				log_add ("Script file name: %s", providers_get_script_filename ());
 
@@ -798,6 +815,7 @@ int main (int argc, char **argv)
 
 				log_add ("Executing script %s ...", filename);
 				system (filename);
+				
 				log_add ("Script terminated");
 			}
 		}
